@@ -1,10 +1,10 @@
-import { Text, Platform, View, ImageBackground, Image, TextInput, Button} from 'react-native';
+import { Text, Platform, View, ImageBackground, Image, TextInput, Button, Alert} from 'react-native';
 import React,{useState, useEffects} from 'react';
 import { BlurView } from 'expo-blur';
-import { Link } from 'expo-router';
+import { Link , useRouter } from 'expo-router';
 import TestUsers from './Test_List/Test_usersNative';
 
-const BACKEND_IP = '192.168.100.10'; // Asegúrate de que esta sea la IP de tu servidor backend
+const BACKEND_IP = 'localhost'; // Asegúrate de que esta sea la IP de tu servidor backend
 const BACKEND_PORT = 5000;
 const LOGIN_URL = `http://${BACKEND_IP}:${BACKEND_PORT}/login`;
 
@@ -14,44 +14,47 @@ const [password, setPassword] = useState('');
 const [loading, setLoading] = useState(false); // Estado para controlar el indicador de carga
 const [error, setError] = useState(null); // Estado para almacenar mensajes de error
 
+const router = useRouter(); // Hook para manejar la navegación
+
+// Función para manejar el inicio de sesión
   const handleLogin = async () => {
     // Limpiar errores y activar el indicador de carga
     setError(null);
     setLoading(true);
 
+    alert(`Intentando iniciar sesión con ${username} y ${password}...`);
     try {
       const response = await fetch(LOGIN_URL, {
         method: 'POST', // Indicar que es una solicitud POST
         headers: {
           'Content-Type': 'application/json', // Indicar que el cuerpo es JSON
         },
-        body: JSON.stringify({ // Convertir los datos a JSON y enviarlos en el cuerpo
-          username: nombre, // El backend espera 'username'
-          password: contrasena, // El backend espera 'password'
+        body: JSON.stringify({
+          nombre: username,     // <-- Ahora el backend recibirá 'nombre' con el valor de 'username'
+          contrasena: password, // <-- Ahora el backend recibirá 'contrasena' con el valor de 'password'
         }),
       });
 
-      const data = await response.json(); // Parsea la respuesta JSON del servidor
+      alert('fecht iniciado');
 
-      if (response.ok) { // Si la respuesta HTTP es exitosa (código 2xx)
-        console.log('Inicio de sesión exitoso:', data);
-        Alert.alert('Éxito', data.message); // Muestra un mensaje de éxito
-        // Aquí podrías:
-        // 1. Guardar el userId en AsyncStorage si lo necesitas para futuras sesiones.
-        //    await AsyncStorage.setItem('userId', data.userId);
-        // 2. Navegar a otra pantalla (ej. la pantalla principal de la app).
-        //    navigation.navigate('Home');
-      } else {
-        // Si la respuesta HTTP NO es exitosa (ej. 400, 401, 500)
-        console.error('Error de inicio de sesión:', data.message || 'Error desconocido');
-        setError(data.message || 'Ocurrió un error. Inténtalo de nuevo.'); // Muestra el mensaje de error del servidor
-        Alert.alert('Error', data.message || 'Error al iniciar sesión.');
+      const data = await response.json(); // Parsea la respuesta JSON del servidor
+      alert('data:', data.message)
+      if (response.ok) { 
+        alert('Login exitoso', data.message);
+        // Aquí puedes redirigir al usuario a la pantalla principal o donde desees
+        router.push({
+            pathname: '/usuario/music',
+            params: {
+                userName: username,
+            },
+          });
+       } else {
+        alert('Login fallido', data.message );
       }
+
     } catch (e) {
-      // Este catch se ejecuta si hay un error de red o algo que impida la comunicación
-      console.error('Error de red o del servidor:', e);
-      setError('No se pudo conectar al servidor. Verifica tu conexión o la IP del backend.');
-      Alert.alert('Error de Conexión', 'No se pudo conectar al servidor. Inténtalo de nuevo.');
+      alert(e.message);
+      alert('Error de Conexión con el servidor', e.message );
     } finally {
       setLoading(false); // Desactivar el indicador de carga al finalizar
     }

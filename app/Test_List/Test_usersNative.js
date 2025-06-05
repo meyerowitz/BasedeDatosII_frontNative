@@ -19,7 +19,7 @@ export default function TestUsers(){
   // - Para iOS Simulator, usa 'localhost' o '127.0.0.1'
   // Si tu backend corre en un dispositivo físico o una máquina diferente:
   // - Usa la IP real de tu máquina (la misma que usaste para broadcast_rpc_address en Cassandra)
-  const BACKEND_IP = '192.168.100.10'; // Ejemplo: '192.168.100.10' o '10.0.2.2' para Android
+  const BACKEND_IP = '192.168.100.29'; // Ejemplo: '192.168.100.10' o '10.0.2.2' para Android
   const BACKEND_PORT = 5000; // El puerto de tu servidor Node.js/Flask (ej: 3001 o 5000)
   const API_URL = `http://${BACKEND_IP}:${BACKEND_PORT}/users`;
 
